@@ -1,28 +1,64 @@
-const http = require('http');
-const fs = require('fs');
+const express = require("express");
+const app = express();
+const path = require('path');
+const port = 3000;
 
-const server = http.createServer((req, res) => {
-    let filePath = "." + req.url;
+app.get("/", (req, res) => {
+  const options = {
+    root: path.join(__dirname)
+  };
 
-    if (filePath == './') {
-        filePath = './index.html';
-    } else if (req.url == '/about') {
-        filePath = './about.html'
-    } else if (req.url == '/contact') {
-        filePath = './contact-me.html'
-    } else filePath = './404.html'
-
-    fs.readFile(filePath, 'utf-8', (err, data) => {
-      if (err) {
-        res.writeHead(404, {'Content-Type': 'text/html'});
-        return res.end();
-      }
-      res.writeHead(200, {'Content-Type': 'text/html'});
-      res.write(data);
-      res.end();
-    });
+  res.sendFile('/index.html', options, function (err) {
+    if (err) {
+      next(err)
+    } else {
+      console.log('Sent:', "served cold")
+    }
+  })
 })
 
-server.listen(8000, () => {
-  console.log(`Server running at ${8000}`);
+app.get("/about", (req, res) => {
+  const options = {
+    root: path.join(__dirname)
+  };
+
+  res.sendFile('/about.html', options, function (err) {
+    if (err) {
+      next(err)
+    } else {
+      console.log('Sent:', "served hot")
+    }
+  })
+})
+
+app.get("/contact", (req, res) => {
+  const options = {
+    root: path.join(__dirname)
+  };
+
+  res.sendFile('/contact-me.html', options, function (err) {
+    if (err) {
+      next(err)
+    } else {
+      console.log('Sent:', "eee")
+    }
+  })
+})
+
+app.use(function(req,res){
+  const options = {
+    root: path.join(__dirname)
+  };
+
+  res.status(404).sendFile('/404.html', options, function (err) {
+    if (err) {
+      next(err)
+    } else {
+      console.log('Sent:', "error page!")
+    }
+  })
+});
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}!`);
 });
